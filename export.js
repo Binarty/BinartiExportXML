@@ -5,13 +5,11 @@
 if (typeof (XML) == 'undefined') XML = function () { };
 
 //  constructor
-
 XML.ObjTree = function () {
     return this;
 };
 
 //  class variables
-
 XML.ObjTree.VERSION = "0.24";
 XML.ObjTree.prototype.xmlDecl = '<?xml version="1.0" encoding="UTF-8" ?>\n';
 XML.ObjTree.prototype.attr_prefix = '-';
