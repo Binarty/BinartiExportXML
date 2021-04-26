@@ -848,11 +848,13 @@ function GetHoles(node, part1) {
         holeDir = node.NToObject(hole.Direction);
         if (rnd2(Math.abs(holeDir.z)) == 1 && node.Contour.IsPointInside(holePos)) {
             hz = holePos.z;
+            const hy = node.TextureOrientation === 1 ? holePos.y + minY : part.cw - holePos.y + minY;
             if (holeDir.z > 0.001) {
                 if (hz <= 0.001 && (hz + hole.obj.Depth) > 0) {
                     depth = hz + hole.obj.Depth;
 
-                    b = new Bore(5, hole.obj.Diameter, holePos.x - minX, part.cw - holePos.y + minY, 0, rnd2(depth));
+
+                    b = new Bore(5, hole.obj.Diameter, holePos.x - minX, hy, 0, rnd2(depth));
                     if (Math.round(part.thick * 10) > Math.round(b.dp * 10))
                         part.bBack.push(b);
                     else {
@@ -865,7 +867,7 @@ function GetHoles(node, part1) {
             } else {
                 depth = hole.obj.Depth - (hz - node.Thickness);
                 if ((hz - node.Thickness) >= -0.001 && depth >= 0.001) {
-                    b = new Bore(4, hole.obj.Diameter, holePos.x - minX, part.cw - holePos.y + minY, 0, rnd2(depth));
+                    b = new Bore(4, hole.obj.Diameter, holePos.x - minX, hy, 0, rnd2(depth));
                     if (Math.round(part.thick * 10) > Math.round(b.dp * 10))
                         part.bFront.push(b);
                     else
@@ -888,12 +890,13 @@ function GetHoles(node, part1) {
                 var bt = (contourButt != null && contourButt.ClipPanel == false) ? contourButt.Thickness : 0;
                 if ((rnd2(contour.DistanceToPoint(holePos) + contour.DistanceToPoint(holeEndPos)) == rnd2(hole.obj.Depth) && (rnd2(contour.DistanceToPoint(holeEndPos) + bt) > 2))) {
                     dp = rnd2(contour.DistanceToPoint(holeEndPos) + bt);
+                    const hy = node.TextureOrientation === 1 ? holePos.y + minY : part.cw - holePos.y + minY;
                     if (hdx == 1) {
-                        bHor.push(new Bore(2, hole.obj.Diameter, 0, part.cw - holePos.y + minY, part.thick - holePos.z, dp));
+                        bHor.push(new Bore(2, hole.obj.Diameter, 0, hy, part.thick - holePos.z, dp));
                         hole.used = isEqualFloat(dp, hole.obj.Depth);
                         break;
                     } else if (hdx == -1) {
-                        bHor.push(new Bore(3, hole.obj.Diameter, 0, part.cw - holePos.y + minY, part.thick - holePos.z, dp));
+                        bHor.push(new Bore(3, hole.obj.Diameter, 0, hy, part.thick - holePos.z, dp));
                         hole.used = isEqualFloat(dp, hole.obj.Depth);;
                         break;
                     } else if (hdx == 0) {
@@ -1064,7 +1067,11 @@ function GetCuts(cuts, line) {
             cut.pos = c.Trajectory[0].Pos1.x;
         } else if (c.Trajectory[0].Pos1.y === c.Trajectory[0].Pos2.y) {
             cut.dir = 'h';
-            cut.pos = c.Trajectory[0].Pos1.y;
+            if (line.textureOrientation === 2) {
+                cut.pos = line.contourHeight - c.Trajectory[0].Pos1.y;
+            } else {
+                cut.pos = c.Trajectory[0].Pos1.y;
+            }
         }
 
         cut.name = c.Name;
@@ -1074,10 +1081,6 @@ function GetCuts(cuts, line) {
         cut.side = GetSideOfCut(c, line.thickness);
 
         res.push(cut);
-    }
-
-    function getDistance(x1, y1, x2, y2) {
-        return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
     }
 
     function CheckGrooveOnRect(c) {
@@ -1159,6 +1162,10 @@ function GetCuts(cuts, line) {
     return {
         cut: res
     };
+}
+
+function getDistance(x1, y1, x2, y2) {
+    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
 function GetObjType(obj) {
