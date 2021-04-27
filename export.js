@@ -971,6 +971,9 @@ function GetHoles(node, part1) {
                 }
             }
         }
+
+
+
         for (var j = 0; j < part.contour.length; j++) {
             contour = part.contour[j];
             if (contour.path[0].Type != 3)
