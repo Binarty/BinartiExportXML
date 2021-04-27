@@ -400,6 +400,7 @@ function GetEdges(butts, gabEdges) {
         }
 
         var butt = {
+            name: ge.name,
             sign: ge.sign,
             thickness: ge.t,
             allowance: ge.allowance,
